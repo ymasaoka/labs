@@ -1,23 +1,23 @@
-param($session = $null, $location = "West US", $resourceGroupName = "cosmoslabs_anfeldma", [switch]$teardown, [switch]$overwriteGroup)
+param($session = $null, $location = "Japan East", $resourceGroupName = "cosmoslabs", [switch]$teardown, [switch]$overwriteGroup)
 
-# Settings to apply to new deployment
-$randomNum = if ($null -eq $session) { Get-Random -Maximum 100000 } else { $session } # some resources need unique names - this could be user entered instead
+# 新しいデプロイに適用する設定
+$randomNum = if ($null -eq $session) { Get-Random -Maximum 100000 } else { $session } # 一部のリソースには一意の名前が必要です - これは代わりにユーザーが入力できます
 $accountName = "cosmoslab$($randomNum)"
 $eventHubNS = "shoppingHub$($randomNum)"
 
 if ($teardown) {
     if ($resourceGroupName -ieq "cosmoslabs"){
-        $resourceGroupName = Read-Host -Prompt "Enter the name of your resource group. If you don't know your resource group name locate the resources used for labs in the Azure portal"
+        $resourceGroupName = Read-Host -Prompt "リソースグループの名前を入力します。リソースグループ名がわからない場合は、Azure ポータルにてラボで使用するリソースを見つけてください。"
     }
 
-    # Remove the whole resource group
-    Write-Output "Preparing to remove all resources in '$($resourceGroupName)'"
+    # リソースグループ全体を削除
+    Write-Output "'$($resourceGroupName)' 内にあるすべてのリソースを削除する準備をしています..."
 
     try {
         $accounts = Get-AzResource -ResourceType "Microsoft.DocumentDb/databaseAccounts" -ApiVersion "2020-04-01" -ResourceGroupName $resourceGroupName -ErrorAction Stop | Select -ExpandProperty Name
     }
     catch {
-        Write-Output "Unable to locate resource group '$($resourceGroupName)' for removal. Please ensure that you are logged in to the correct Azure subscription."
+        Write-Output "削除するリソースグループ '$($resourceGroupName)' が見つかりません。正しい Azure サブスクリプションにログインしていることを確認してください。"
         exit
     }
 
@@ -30,27 +30,27 @@ if ($teardown) {
     }
 
     if (-not $structureMatch) {
-        Read-Host "Unable to confirm that resource group '$($resourceGroupName)' contains lab resources. Please verify resource group contents and delete manually from https://portal.azure.com. Press Enter to end script"
+        Read-Host "リソースグループ '$($resourceGroupName)' にラボリソースが含まれていることを確認できませんでした。リソースグループの内容を確認し、https://portal.azure.com から手動で削除してください。Enter キーを押してスクリプトを終了します。"
         exit
     }
 
-    $confirmation = Read-Host -Prompt "Removal of Azure Resource Group '$($resourceGroupName)' will also delete all resources within the resource group. Are you sure you want to continue with removal? (yes or no)"
+    $confirmation = Read-Host -Prompt "Azure リソースグループ '$($resourceGroupName)' を削除すると、リソースグループ内のすべてのリソースも削除されます。削除を続行してもよろしいですか? (yes or no)"
     
     if ($confirmation -eq 'yes') {
         Remove-AzResourceGroup -Name $resourceGroupName
-        Write-Output "Lab resource teardown complete"
+        Write-Output "ラボリソースの削除が完了しました。"
     }
     else {
-        Write-Output "Lab resource teardown cancelled"
+        Write-Output "ラボリソースの削除がキャンセルされました。"
     }
 
     exit
 }
 
-Write-Output "Setting up resources in region '$($location)':" $resourceGroupName $accountName "  FinancialDatabase" "  NutritionDatabase" "  StoreDatabase" $eventHubNS
+Write-Output "リージョン '$($location)' にリソースを設定しています:" $resourceGroupName $accountName "  FinancialDatabase" "  NutritionDatabase" "  StoreDatabase" $eventHubNS
 
 
-### Helper Functions #####
+### ヘルパー関数 #####
 function New-Database ($resourceGroupName, $accountName, $databaseName) {
     $databaseResourceName = $accountName + "/sql/" + $databaseName
 
@@ -106,7 +106,7 @@ function New-Container ($resourceGroupName, $accountName, $databaseName, $contai
 function Add-DataSet ($resourceGroupName, $dataFactoryName, $location, $cosmosAccount, $cosmosDatabase, $cosmosContainer) {
     $cosmosLocation = "https://$cosmosAccount.documents.azure.com:443/"
 
-    # Blob location should be replaced by new hosted container-read SAS
+    # Blob のロケーションは、新しいホストされた読み取りコンテナーの SAS に置き換える必要があります
     $storageAccountLocation = "https://cosmosdblabsv3.blob.core.windows.net"
     $storageAccountSas = "?sv=2018-03-28&ss=bfqt&srt=sco&sp=rlp&se=2022-01-01T04:55:28Z&st=2019-08-05T20:02:28Z&spr=https&sig=%2FVbismlTQ7INplqo6WfU8o266le72o2bFdZt1Y51PZo%3D"
     $sourceBlobFolder = "nutritiondata"
@@ -117,12 +117,12 @@ function Add-DataSet ($resourceGroupName, $dataFactoryName, $location, $cosmosAc
         -ResourceType "Microsoft.DocumentDb/databaseAccounts" -ApiVersion "2015-04-08" -Force `
         -ResourceGroupName $resourceGroupName -Name $cosmosAccount | Select-Object -First 1 -ExpandProperty primaryMasterKey
 
-    # Create a data factory
+    # Azure Data Factory V2を作成
     $df = Set-AzDataFactoryV2 -ResourceGroupName $resourceGroupName -Location $location -Name $dataFactoryName -Force
 
-    # Create an Az.Storage linked service in the data factory
+    # Azure Data Factory で Az.Storage リンクサービスを作成
 
-    ## JSON definition of the linked service. 
+    ## リンクサービスの JSON 定義
     $storageLinkedServiceDefinition = @"
 {
     "name": "AzureStorageLinkedService",
@@ -153,17 +153,17 @@ function Add-DataSet ($resourceGroupName, $dataFactoryName, $location, $cosmosAc
     }
 "@
 
-    ## IMPORTANT: stores the JSON definition in a file that will be used by the Set-AzDataFactoryLinkedService command. 
+    ## 重要: JSON 定義を Set-AzDataFactoryLinkedService コマンドで使用されるファイルに保存します。
     $storageLinkedServiceDefinition | Out-File StorageLinkedService.json
     $cosmosLinkedServiceDefinition | Out-File CosmosLinkedService.json
     
-    ## Creates a linked service in the data factory
+    ## Azure Data Factory でリンクサービスを作成
     Set-AzDataFactoryV2LinkedService -DataFactoryName $dataFactoryName -ResourceGroupName $resourceGroupName -Name "AzureStorageLinkedService" -File StorageLinkedService.json -Force
     Set-AzDataFactoryV2LinkedService -DataFactoryName $dataFactoryName -ResourceGroupName $resourceGroupName -Name "CosmosLinkedService" -File CosmosLinkedService.json -Force
 
-    # Create an Azure Blob dataset in the data factory
+    # Azure Data Factory で Azure Blob データセットを作成
 
-    ## JSON definition of the dataset
+    ## データセットの JSON 定義
     $datasetDefinition = @"
 {
     "name": "BlobDataset",
@@ -202,17 +202,17 @@ function Add-DataSet ($resourceGroupName, $dataFactoryName, $location, $cosmosAc
 }
 "@
 
-    ## IMPORTANT: store the JSON definition in a file that will be used by the Set-AzDataFactoryDataset command. 
+    ## 重要: Set-AzDataFactoryDataset コマンドで使用されるファイルに JSON 定義を保存します。
     $datasetDefinition | Out-File BlobDataset.json
     $cosmosDatasetDefinition | Out-File CosmosDataset.json
 
-    ## Create a dataset in the data factory
+    ## Azure Data Factory でデータセットを作成
     Set-AzDataFactoryV2Dataset -DataFactoryName $dataFactoryName -ResourceGroupName $resourceGroupName -Name "BlobDataset" -File "BlobDataset.json" -Force
     Set-AzDataFactoryV2Dataset -DataFactoryName $dataFactoryName -ResourceGroupName $resourceGroupName -Name "CosmosDataset" -File "CosmosDataset.json" -Force
 
-    # Create a pipeline in the data factory
+    # Azure Data Factory でパイプラインを作成
 
-    ## JSON definition of the pipeline
+    ## パイプラインの JSON 定義
     $pipelineDefinition = @"
 {
     "name": "$pipelineName",
@@ -251,33 +251,33 @@ function Add-DataSet ($resourceGroupName, $dataFactoryName, $location, $cosmosAc
 }
 "@
 
-    ## IMPORTANT: store the JSON definition in a file that will be used by the Set-AzDataFactoryPipeline command. 
+    ## 重要: Set-AzDataFactoryPipeline コマンドで使用されるファイルに JSON 定義を保存します。
     $pipelineDefinition | Out-File CopyPipeline.json
 
-    ## Create a pipeline in the data factory
+    ## Azure Data Factory でパイプラインを作成
     Set-AzDataFactoryV2Pipeline -DataFactoryName $dataFactoryName -ResourceGroupName $resourceGroupName -Name $pipelineName -File "CopyPipeline.json" -Force
 
-    # Create a pipeline run 
+    # パイプライン実行を作成
 
-    # Create a pipeline run by using parameters
+    # パラメーターを使用して実行するパイプラインを作成
     $runId = Invoke-AzDataFactoryV2Pipeline -DataFactoryName $dataFactoryName -ResourceGroupName $resourceGroupName -PipelineName $pipelineName
 
-    # Check the pipeline run status until it finishes the copy operation
+    # コピー操作が完了するまでパイプラインの実行ステータスを確認
     while ($True) {
         $result = Get-AzDataFactoryV2ActivityRun -DataFactoryName $dataFactoryName -ResourceGroupName $resourceGroupName -PipelineRunId $runId -RunStartedAfter (Get-Date).AddMinutes(-30) -RunStartedBefore (Get-Date).AddMinutes(30)
 
         if (($result | Where-Object { $_.Status -eq "InProgress" } | Measure-Object).count -ne 0) {
-            Write-Host "Pipeline run status: In Progress" -foregroundcolor "Yellow"
+            Write-Host "パイプライン実行ステータス: 進行中" -foregroundcolor "Yellow"
             Start-Sleep -Seconds 30
         }
         else {
-            Write-Host "Pipeline '$pipelineName' run finished. Result:" -foregroundcolor "Yellow"
+            Write-Host "パイプライン '$pipelineName' の実行が終了しました。結果:" -foregroundcolor "Yellow"
             $result
             break
         }
     }
 
-    # Get the activity run details 
+    # アクティビティ実行の詳細を取得 
     $result = Get-AzDataFactoryV2ActivityRun -DataFactoryName $dataFactoryName -ResourceGroupName $resourceGroupName `
         -PipelineRunId $runId `
         -RunStartedAfter (Get-Date).AddMinutes(-10) `
@@ -304,7 +304,7 @@ function Add-EventHub($resourceGroupName, $location, $eventHubNS, $eventHubName,
 }
 
 function Add-StreamProcessor($resourceGroupName, $location, $eventHubNS, $jobName) {
-    # NOTE - Creating a Power BI Output is not supported via scripting
+    # 備考 - C スクリプトによる Power BI 出力の作成はサポートされていません
 
     $jobDefinition = @"
     {
@@ -385,12 +385,12 @@ function Add-StreamProcessor($resourceGroupName, $location, $eventHubNS, $jobNam
 ##################
 
 
-# Begin Setup
+# セットアップを開始
 if(!$overwriteGroup){
     Get-AzResourceGroup -Name $resourceGroupName -ErrorVariable notPresent -ErrorAction SilentlyContinue
 
     if(!$notPresent){
-        throw "A resource group called " + $resourceGroupName + " already exists. If you'd like to overwrite it, use the -overwriteGroup switch";
+        throw $resourceGroupName + " というリソースグループは既に存在します。上書きする場合は、-overwriteGroup スイッチを使用します。";
     }
 
 }

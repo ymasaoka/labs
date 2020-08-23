@@ -1,97 +1,97 @@
-# Account Setup
+# アカウントのセットアップ
 
-In this lab, you will setup your Azure subscription with the required resources needed to perform the Cosmos DB labs. The estimated cost to run these labs if you do it in one sitting is ~$100 USD.
+このラボでは、Cosmos DB ラボを実行するために必要なリソースをもつ Azure サブスクリプションをセットアップします。これらのラボを一度に実行する場合の推定費用は、最大約12,000円です。
 
-## Prerequisites
+## 前提条件
 
-- Azure Paid Subscription
-- [Azure PowerShell Module](https://docs.microsoft.com/en-us/powershell/azure/install-az-ps)
+- Azure の有料サブスクリプション
+- [Azure PowerShell Module](https://docs.microsoft.com/ja-jp/powershell/azure/install-az-ps)
 
-## Lab Content Setup
+## ラボコンテンツのセットアップ
 
-1. To begin setup, Git clone or download the repo containing these instructions from [Github](https://github.com/CosmosDB/labs).
+1. セットアップを開始するには、これらの手順を含むリポジトリを [GitHub](https://github.com/ymasaoka/labs/tree/ja-jp) から Git clone もしくはダウンロードします。
 
-2. Open Windows Powershell
-3. Navigate to the folder containing your downloaded copy of the repo
-4. Inside the repo, navigate to the **dotnet\setup** folder:
+2. Windows Powershell を起動します。
+3. ダウンロードしたリポジトリのコピーを含むフォルダーに移動します
+4. リポジトリ内で、**dotnet\setup** フォルダーに移動します:
 
    ```powershell
    cd .\dotnet\setup\
    ```
 
-5. To enable the setup scripts to run in your current Powershell session, enter the following:
+5. 現在の Powershell セッションでセットアップスクリプトを実行できるようにするには、次のように入力します:
 
    ```powershell
    Set-ExecutionPolicy Unrestricted -Scope Process
    ```
 
-   > This setting will only apply within your current Powershell window.
+   > この設定は、現在の Powershell ウィンドウ内でのみ適用されます。
 
-6. Many of the labs refer to pre-built code to use as a starting point for the lab instructions. To automatically copy this starter code for the labs into a **CosmosLabs** folder in your **Documents** folder run the labCodeSetup.ps1 script:
+6. ラボの多くは、ラボの手順の開始点として使用するビルド済みのコードを参照しています。ラボのこのスターターコードを **Documents** フォルダー内の **CosmosLabs** フォルダーに自動的にコピーするには、labCodeSetup.ps1 スクリプトを実行します:
 
    ```powershell
    .\labCodeSetup.ps1
    ```
 
-   > The starter code for each lab is located inside the **templates** folder. To use a folder other that **Documents\CosmosLabs** for your lab code, the files can be copied manually instead.
+   > 各ラボのスターターコードは **templates** フォルダー内にあります。**Documents\CosmosLabs** 以外のフォルダーを使用するには、代わりにファイルを手動でコピーしてください。
 
-7. To begin Azure resource setup, first connect to your Azure account:
+7. Azure リソースのセットアップを開始するには、まず Azure アカウントに接続します:
 
    ```powershell
    Connect-AzAccount
    ```
 
-   or
+   もしくは
 
    ```powershell
-   Connect-AzAccount -subscription <subscription id>
+   Connect-AzAccount -subscription <サブスクリプション ID>
    ```
 
-8. To create the Azure resources for the labs run the labSetup.ps1 script:
+8. ラボ用の Azure リソースを作成するには、labSetup.ps1 スクリプトを実行します:
 
    ```powershell
    .\labSetup.ps1
    ```
 
-   - This script creates resources in the _West US_ region by default. To use another region add **-location 'region name'** to the above command.
+   - このスクリプトは、デフォルトで _Japan East_ リージョンにリソースを作成します。別のリージョンを使用するには、上記のコマンドに **-location 'リージョン名'** を追加してください。
 
-   - By default this script uses _cosmoslabs_ as the name of the resource group. You can use another name by adding **-resourceGroupName 'name'** to the above command
+   - デフォルトでは、このスクリプトは _cosmoslabs_ をリソースグループの名前として使用します。上記のコマンドに **-resourceGroupName 'リソースグループ名'** を追加すると、別の名前を使用できます。
 
-   - This script will fail if the specified resource group already exists. To bypass this failure and create the resources anyway, add **-overwriteGroup** to the above command.
+   - 指定したリソースグループが既に存在する場合、このスクリプトは失敗します。この失敗を回避してリソースを作成するには、上記のコマンドに **-overwriteGroup** を追加します。
 
-9. Some Azure resources can take 10 minutes or more to complete setup so expect the script to run for a while before completing. After the script completes, your account should contain a **cosmoslabs** resource group with several pre-configured resources:
+9. 一部の Azure リソースはセットアップを完了するのに10分以上かかる場合があるため、完了までスクリプトがしばらく実行されることを想定しておいてください。スクリプトが完了すると、アカウントにはいくつかの事前構成されたリソースが含まれた **cosmoslabs** リソースグループが含まれるようになります:
 
    - Azure CosmosDB Account
    - Stream Analytics Job
    - Azure Data Factory
    - Event Hubs Namespace
 
-## Log-in to the Azure Portal
+## Azure ポータルにログイン
 
-1. In a new window, sign in to the **Azure Portal** (<https://portal.azure.com>).
+1. 新しいウィンドウで、 **Azure ポータル** (<https://portal.azure.com>) にサインインします。
 
-1. Once you have logged in, you may be prompted to start a tour of the Azure portal. You can safely skip this step.
+1. ログインすると、Azure ポータルのツアーを開始するように求められる場合があります。このステップは安全にスキップできます。
 
-### Retrieve Account Credentials
+### アカウント資格情報を取得
 
-The .NET SDK requires credentials to connect to your Azure Cosmos DB account. You will collect and store these credentials for use throughout the lab.
+.NET SDK では、Azure Cosmos DB アカウントに接続するための資格情報が必要です。ラボ全体で使用するこれらの資格情報を取得して保存します。
 
-1. On the left side of the portal, select the **Resource groups** link.
+1. ポータルの左側で、**リソースグループ** リンクを選択します。
 
    ![Resource groups is highlighted](../media/02-resource_groups.jpg "Select resource groups")
 
-1. In the **Resource groups** blade, locate and select the **cosmoslabs** _Resource Group_.
+1. **リソースグループ** ブレードで、**cosmoslabs** _リソースグループ_ を見つけて選択します。
 
    ![The recently cosmosdb resource group is highlighted](../media/02-lab_resource_group.jpg "Select the CosmosDB resource group")
 
-1. In the **cosmoslabs** blade, select the **Azure Cosmos DB** account you recently created.
+1. **cosmoslabs** ブレードで、最近作成した **Azure Cosmos DB** アカウントを選択します。
 
    ![The Cosmos DB resource is highlighted](../media/02-cosmos_resource.jpg "Select the Cosmos DB resource")
 
-1. In the **Azure Cosmos DB** blade, locate the **Settings** section and select the **Keys** link.
+1. **Azure Cosmos DB** ブレードで、**設定** セクションを見つけ、**キー** リンクを選択します。
 
    ![The Keys pane is highlighted](../media/02-keys_pane.jpg "Select the Keys Pane")
 
-1. In the **Keys** pane, record the values in the **CONNECTION STRING**, **URI** and **PRIMARY KEY** fields. You will use these values later in this lab.
+1. **キー**ペインで、**プライマリ接続文字列**、**URI** と **プライマリキー** フィールドの値を記録します。これらの値は、以降のラボにて使用します。
 
    ![The URI, Primary Key and Connection string credentials are highlighted](../media/02-keys.jpg "Copy the URI, primary key and the connection string")

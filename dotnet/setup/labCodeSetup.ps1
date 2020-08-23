@@ -9,15 +9,15 @@ catch{
     $directoryInfo = Get-ChildItem $targetPath | Measure-Object
 
     if ($directoryInfo.count -eq 0){
-        Write-Output "Found existing folder '$targetPath'"
+        Write-Output "既存のフォルダ '$targetPath' が見つかりました。"
     }
     else{
-        Write-Output "Folder '$targetPath' has existing files. Please delete or move files from the folder before starting new lab code setup to avoid conflicts."
+        Write-Output "フォルダ '$targetPath' には既存のファイルがあります。新しいラボコードのセットアップを開始する前に、フォルダーからファイルを削除または移動して、競合を回避してください。"
         exit
     }
 }
 
 Copy-Item -Path .\templates\* -Filter "*.*" -Recurse -Destination $targetPath -Container -Force
 
-Write-Output "" "Copied all lab code files to '$targetPath'"
+Write-Output "" "すべてのラボコードファイルを '$targetPath' にコピーしました。"
 
