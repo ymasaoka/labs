@@ -75,38 +75,6 @@
 
     ![The project file and the program.cs file are highlighted](../media/02-project_files.jpg "Review the Project files")
 
-1. **エクスプローラー** ペインで **[ フォルダ名 ].csproj** ファイルを選択し、エディターでファイルを開きます。
-
-1. ここで、 **Project** 要素内のプロジェクト構成に新しい **PropertyGroup** XML要素を追加します。新しい **PropertyGroup** を追加するには、`<Project Sdk="Microsoft.NET.Sdk">` という行の下に次のコード行を挿入します:
-
-    ```xml
-    <PropertyGroup>
-        <LangVersion>latest</LangVersion>
-    </PropertyGroup>
-    ```
-
-1. 新しい XML は次のようになります:
-
-    ```xml
-    <Project Sdk="Microsoft.NET.Sdk">
-        <PropertyGroup>
-            <LangVersion>latest</LangVersion>
-        </PropertyGroup>
-        <PropertyGroup>
-            <OutputType>Exe</OutputType>
-            <TargetFramework>netcoreapp3.1</TargetFramework>
-        </PropertyGroup>
-        <ItemGroup>
-            <PackageReference Include="Bogus" Version="30.0.2" />
-            <PackageReference Include="Microsoft.Azure.Cosmos" Version="3.12.0" />
-        </ItemGroup>
-    </Project>
-    ```
-
-1. **エクスプローラー** ペインで **Program.cs** ファイルを選択して、エディターでファイルを開きます。
-
-    ![The program.cs file is opened in VS Code](../media/02-program_editor.jpg "Open the program.cs file")
-
 ### Create インスタンスを作成
 
 CosmosClient クラスは、Azure Cosmos DB で SQL API を使用するための主要な「入り口」です。クラスのコンストラクターのパラメーターとして接続メタデータを渡し、**CosmosClient** クラスのインスタンスを作成します。その後、このクラスインスタンスをラボ全体で使用します。
@@ -119,22 +87,12 @@ CosmosClient クラスは、Azure Cosmos DB で SQL API を使用するための
     using Microsoft.Azure.Cosmos;
     ```
 
-1. **Program** クラスを見つけて、次のクラスに置き換えます:
-
-    ```csharp
-    public class Program
-    {
-        public static async Task Main(string[] args)
-        {
-        }
-    }
-    ```
-
 1. **Program** クラス内に次のコード行を追加して、接続情報の変数を作成します:
 
     ```csharp
     private static readonly string _endpointUri = "";
     private static readonly string _primaryKey = "";
+    private static CosmosClient _client;
     ```
 
 1. `_endpointUri` 変数については、プレースホルダー値を Azure Cosmos DB アカウントの **URI** 値に置き換えます。
@@ -147,18 +105,21 @@ CosmosClient クラスは、Azure Cosmos DB で SQL API を使用するための
 
     > **URI** と **PRIMARY KEY** の値を記録しておいてください。後でこのラボで再度使用します。
 
-1. **Main** メソッドを見つけます:
+1. **Program** クラスを見つけて、次のクラスに置き換えます:
 
     ```csharp
-    public static async Task Main(string[] args)
+    public class Program
     {
+        public static async Task Main(string[] args)
+        {
+        }
     }
     ```
 
 1. **Main** メソッド内に次のコード行を追加して、**CosmosClient** インスタンスを作成して破棄する using 文を作成します:
 
     ```csharp
-    using CosmosClient client = new CosmosClient(_endpointUri, _primaryKey);
+    _client = new CosmosClient(_endpointUri, _primaryKey);
     ```
 
 1. あなたの `Program` クラス定義は次のようになります:
@@ -171,7 +132,7 @@ CosmosClient クラスは、Azure Cosmos DB で SQL API を使用するための
 
         public static async Task Main(string[] args)
         {
-            using CosmosClient client = new CosmosClient(_endpointUri, _primaryKey);
+            _client = new CosmosClient(_endpointUri, _primaryKey);
         }
     }
     ```
@@ -199,22 +160,15 @@ CosmosClient クラスは、Azure Cosmos DB で SQL API を使用するための
 ```csharp
     private static async Task<Database> InitializeDatabase(CosmosClient client, string databaseId)
     {
-        DatabaseResponse databaseResponse = await client.CreateDatabaseIfNotExistsAsync(databaseId);
-        Database targetDatabase = databaseResponse.Database;
-        await Console.Out.WriteLineAsync($"Database Id:\t{targetDatabase.Id}");
-        return targetDatabase;
+        Database database = await client.CreateDatabaseIfNotExistsAsync(databaseId);
+        await Console.Out.WriteLineAsync($"Database Id:\t{database.Id}");
+        return database;
     }
 ```
 
 > このコードは、渡された名前でデータベースが Azure Cosmos DB アカウントに存在するかどうかを確認します。 一致するデータベースが存在しない場合は、新しいデータベースを作成して返します。
 
-1. **Main** メソッド内で using ブロックを見つけます:
-
-    ```csharp
-    using CosmosClient client = new CosmosClient(_endpointUri, _primaryKey);
-    ```
-
-1. メソッドに次のコードを追加して、新しい `Database` インスタンスがまだ存在しない場合は作成します:
+1. **Main** メソッドを見つけ、メソッドに次のコードを追加して、新しい `Database` インスタンスがまだ存在しない場合は作成します:
 
     ```csharp
     Database database = await InitializeDatabase(client, "EntertainmentDatabase");
@@ -228,7 +182,7 @@ CosmosClient クラスは、Azure Cosmos DB で SQL API を使用するための
     dotnet run
     ```
 
-    > 実行中のコマンドの出力を確認します。 コンソールウィンドウに、Azure Cosmos DB アカウントのデータベースリソースの ID 文字列が表示されます。
+    > 実行中のコマンドの出力を確認します。コンソールウィンドウに、Azure Cosmos DB アカウントのデータベースリソースの ID 文字列が表示されます。
 
 1. **🗙** 記号を選択して、ターミナルペインを閉じます。
 
@@ -276,7 +230,7 @@ CosmosClient クラスは、Azure Cosmos DB で SQL API を使用するための
     ```csharp
     ContainerProperties containerProperties = new ContainerProperties(containerId, "/type")
     {
-        IndexingPolicy = indexingPolicy,
+        IndexingPolicy = indexingPolicy
     };
     ```
 
@@ -285,8 +239,7 @@ CosmosClient クラスは、Azure Cosmos DB で SQL API を使用するための
 1. データベース内にまだコンテナーが存在していない場合は、次のコード行を追加して新しい ``Container`` インスタンスを作成します。前段で作成した設定と **スループット** の値を指定します:
 
     ```csharp
-    ContainerResponse containerResponse = await database.CreateContainerIfNotExistsAsync(containerProperties, 10000);
-    Container container = containerResponse.Container;
+    Container container = await database.CreateContainerIfNotExistsAsync(containerProperties, 400);
     ```
 
     > このコードは、指定されたすべてのパラメーターを満たすコンテナーがデータベースに存在するかどうかを確認します。一致するコンテナーが存在しない場合は、新しいコンテナーが作成されます。ここで、新しく作成されたコンテナーに割り当てる RU/s を指定できます。これが指定されていない場合、SDK はデフォルト値が 400 RU/s のコンテナーを作成します。
@@ -303,10 +256,9 @@ CosmosClient クラスは、Azure Cosmos DB で SQL API を使用するための
 1. **Main** メソッド内で `InitializeDatabase()` 行を見つけます:
 
     ```csharp
-    using CosmosClient client = new CosmosClient(_endpointUri, _primaryKey);
+    _client = new CosmosClient(_endpointUri, _primaryKey);
 
     Database database = await InitializeDatabase(client, "EntertainmentDatabase");
-
     ```
 
 1. 次のコードをメソッドに追加して、`InitializeContainer()` メソッドを呼び出し、新しい `Container` インスタンスがまだ存在しない場合は作成します:
