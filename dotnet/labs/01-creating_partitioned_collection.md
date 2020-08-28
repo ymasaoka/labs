@@ -87,7 +87,7 @@ CosmosClient クラスは、Azure Cosmos DB で SQL API を使用するための
     using Microsoft.Azure.Cosmos;
     ```
 
-1. **Program** クラス内に次のコード行を追加して、接続情報の変数を作成します:
+1. **Program** クラス内に次のコード行を追加して、接続情報と CosmosClient の変数を作成します:
 
     ```csharp
     private static readonly string _endpointUri = "";
@@ -97,15 +97,23 @@ CosmosClient クラスは、Azure Cosmos DB で SQL API を使用するための
 
 1. `_endpointUri` 変数については、プレースホルダー値を Azure Cosmos DB アカウントの **URI** 値に置き換えます。
 
-    > たとえば、**uri** が `https://cosmosacct.documents.azure.com:443/`　の場合、新しい変数の割り当ては次のようになります: `private static readonly string _endpointUri = "https://cosmosacct.documents.azure.com:443/";`
+    > たとえば、**URI** が `https://cosmosacct.documents.azure.com:443/` の場合、新しい変数の割り当ては次のようになります:
+
+    ```csharp
+    private static readonly string _endpointUri = "https://cosmosacct.documents.azure.com:443/";
+    ```
 
 1. `_primaryKey` 変数については、プレースホルダー値を Azure Cosmos DB アカウントの **PRIMARY KEY** 値に置き換えます。
 
-    > たとえば、**primary key** が `elzirrKCnXlacvh1CRAnQdYVbVLspmYHQyYrhx0PltHi8wn5lHVHFnd1Xm3ad5cn4TUcH4U0MSeHsVykkFPHpQ==` の場合、新しい変数の割り当ては次のようになります: `private static readonly string _primaryKey = "elzirrKCnXlacvh1CRAnQdYVbVLspmYHQyYrhx0PltHi8wn5lHVHFnd1Xm3ad5cn4TUcH4U0MSeHsVykkFPHpQ==";`.
+    > たとえば、**PRIMARY KEY** が ``elzirrKCnXlacvh1CRAnQdYVbVLspmYHQyYrhx0PltHi8wn5lHVHFnd1Xm3ad5cn4TUcH4U0MSeHsVykkFPHpQ==`` の場合、新しい変数の割り当ては次のようになります:
+
+    ```csharp
+    private static readonly string _primaryKey = "elzirrKCnXlacvh1CRAnQdYVbVLspmYHQyYrhx0PltHi8wn5lHVHFnd1Xm3ad5cn4TUcH4U0MSeHsVykkFPHpQ==";
+    ```
 
     > **URI** と **PRIMARY KEY** の値を記録しておいてください。後でこのラボで再度使用します。
 
-1. **Program** クラスを見つけて、次のクラスに置き換えます:
+1. **Main** メソッドを見つけて、次の非同期 **Main** メソッドに置き換えます:
 
     ```csharp
     public class Program
@@ -116,7 +124,7 @@ CosmosClient クラスは、Azure Cosmos DB で SQL API を使用するための
     }
     ```
 
-1. **Main** メソッド内に次のコード行を追加して、**CosmosClient** インスタンスを作成して破棄する using 文を作成します:
+1. **Main** メソッド内に次のコード行を追加して、新しい **CosmosClient** インスタンスをインスタンス化します:
 
     ```csharp
     _client = new CosmosClient(_endpointUri, _primaryKey);
@@ -129,6 +137,7 @@ CosmosClient クラスは、Azure Cosmos DB で SQL API を使用するための
     {
         private static readonly string _endpointUri = "<your uri>";
         private static readonly string _primaryKey = "<your key>";
+        private static CosmosClient _client;
 
         public static async Task Main(string[] args)
         {
@@ -155,7 +164,7 @@ CosmosClient クラスは、Azure Cosmos DB で SQL API を使用するための
 
 ### SDK を使用したデータベースの作成
 
-1. **Main** メソッドの下に新しいメソッドを作成します:
+1. **Main()** メソッドの下に `InitializeDatabase()` という新しいメソッドを作成します:
 
 ```csharp
     private static async Task<Database> InitializeDatabase(CosmosClient client, string databaseId)
@@ -166,12 +175,24 @@ CosmosClient クラスは、Azure Cosmos DB で SQL API を使用するための
     }
 ```
 
-> このコードは、渡された名前でデータベースが Azure Cosmos DB アカウントに存在するかどうかを確認します。 一致するデータベースが存在しない場合は、新しいデータベースを作成して返します。
+> このコードは、渡された名前でデータベースが Azure Cosmos DB アカウントに存在するかどうかを確認します。一致するデータベースが存在しない場合は、新しいデータベースを作成して返します。
 
-1. **Main** メソッドを見つけ、メソッドに次のコードを追加して、新しい `Database` インスタンスがまだ存在しない場合は作成します:
+1. **Main** メソッドを見つけ、次のコードをメソッドに追加して、新しい `Database` インスタンスがまだ存在しない場合は作成します:
 
     ```csharp
     Database database = await InitializeDatabase(client, "EntertainmentDatabase");
+    ```
+
+1. **Main** メソッドは次のようになります:
+
+    ```csharp
+    public static async Task Main(string[] args)
+    {
+
+        _client = new CosmosClient(_endpointUri, _primaryKey);
+
+        Database database = await InitializeDatabase(_client, "EntertainmentDatabase");
+    }
     ```
 
 1. 開いているすべてのエディタータブを保存します。
@@ -193,7 +214,7 @@ CosmosClient クラスは、Azure Cosmos DB で SQL API を使用するための
 1. **InitializeDatabase()** メソッドの下に、次の新しいメソッドを作成します:
 
 ```csharp
-    private static async Task<Database> InitializeContainer(Database database, string containerId)
+    private static async Task<Container> InitializeContainer(Database database, string containerId)
     {
 
     }
@@ -223,7 +244,7 @@ CosmosClient クラスは、Azure Cosmos DB で SQL API を使用するための
     };
     ```
 
-    > 既定では、すべての Azure Cosmos DB データにインデックスが作成されます。多くのお客様は、Azure Cosmos DB にインデックス作成のすべての側面を自動的に処理させることに満足していますが、コンテナーに対してカスタムインデックス作成ポリシーを指定することも可能です。このインデックスポリシーは、SDK によって作成されたデフォルトのインデックスポリシーと非常に似ています。
+    > ここに示すインデックスポリシーは、インデックスポリシーが定義されていない場合に作成されるものです。既定では、すべての Azure Cosmos DB データにインデックスが作成されます。多くのお客様は、Azure Cosmos DBが自動的にすべてのデータにインデックスを作成できるようにしています。また一方で、カスタムインデックスポリシーを指定することもできます。通常、これにより、特定のパスがインデックスに登録されなくなり、書き込み量の多いシナリオでの書き込みのパフォーマンスが向上します。しかしながら、除外されたパスがクエリで使用されている場合、クエリが高価で非常に遅くなるため、各オプションを比較検討するのが最適です。
 
 1. インデックス作成ポリシーの下に次のコードを追加して、パーティションキーが `/type` の新しい `ContainerProperties` インスタンスを作成し、前段で作成した `IndexingPolicy` を含めます:
 
@@ -258,7 +279,8 @@ CosmosClient クラスは、Azure Cosmos DB で SQL API を使用するための
     ```csharp
     _client = new CosmosClient(_endpointUri, _primaryKey);
 
-    Database database = await InitializeDatabase(client, "EntertainmentDatabase");
+    Database database = await InitializeDatabase(_client, "EntertainmentDatabase");
+
     ```
 
 1. 次のコードをメソッドに追加して、`InitializeContainer()` メソッドを呼び出し、新しい `Container` インスタンスがまだ存在しない場合は作成します:
@@ -272,9 +294,9 @@ CosmosClient クラスは、Azure Cosmos DB で SQL API を使用するための
     ```csharp
     public static async Task Main(string[] args)
     {
-        using CosmosClient client = new CosmosClient(_endpointUri, _primaryKey);
+        _client = new CosmosClient(_endpointUri, _primaryKey);
 
-        Database database = await InitializeDatabase(client, "EntertainmentDatabase");
+        Database database = await InitializeDatabase(_client, "EntertainmentDatabase");
 
         Container container = await InitializeContainer(database, "EntertainmentContainer");
     }
@@ -323,10 +345,10 @@ CosmosClient クラスは、Azure Cosmos DB で SQL API を使用するための
         .RuleFor(i => i.unitPrice, (fake) => Math.Round(fake.Random.Decimal(1.99m, 15.99m), 2))
         .RuleFor(i => i.quantity, (fake) => fake.Random.Number(1, 5))
         .RuleFor(i => i.totalPrice, (fake, user) => Math.Round(user.unitPrice * user.quantity, 2))
-        .GenerateLazy(500);
+        .GenerateLazy(100);
     ```
 
-    > 注意として、Bogus ライブラリは一連のテストデータを生成します。この例では、Bogus ライブラリと上記のルールを使用して 500 アイテムを作成しています。**GenerateLazy** メソッドは、**IEnumerable** タイプの変数を返すことにより、500 アイテムのリクエストに備えるように Bogus ライブラリに指示します。LINQ はデフォルトで遅延実行を使用するため、コレクションが反復されるまで、アイテムは実際には作成されません。
+    > 注意として、Bogus ライブラリは一連のテストデータを生成します。この例では、Bogus ライブラリと上記のルールを使用して 100 アイテムを作成しています。**GenerateLazy** メソッドは、**IEnumerable** タイプの変数を返すことにより、100 アイテムのリクエストに備えるように Bogus ライブラリに指示します。LINQ はデフォルトで遅延実行を使用するため、コレクションが反復されるまで、アイテムは実際には作成されません。
 
 1. 次の foreach ブロックを追加して、`PurchaseFoodOrBeverage` インスタンスを反復処理します:
 
@@ -350,7 +372,7 @@ CosmosClient クラスは、Azure Cosmos DB で SQL API を使用するための
     await Console.Out.WriteLineAsync($"Item Created\t{result.Resource.id}");
     ```
 
-    > `CosmosItemResponse` タイプには `Resource` という名前のプロパティがあり、アイテムを表すオブジェクトと、ETag などのアイテムに関する興味深いデータにアクセスできる他のプロパティが含まれています。
+    > `CosmosItemResponse` タイプには、アイテムを表すオブジェクトと、挿入操作やその ETag を実行するための Request Charge など、アイテムに関する興味深いデータへのアクセスを提供する他のプロパティを含む `Resource` という名前のプロパティがあります。
 
 1. **LoadFoodAndBeverage** メソッドは次のようになります:
 
@@ -363,7 +385,7 @@ CosmosClient クラスは、Azure Cosmos DB で SQL API を使用するための
             .RuleFor(i => i.unitPrice, (fake) => Math.Round(fake.Random.Decimal(1.99m, 15.99m), 2))
             .RuleFor(i => i.quantity, (fake) => fake.Random.Number(1, 5))
             .RuleFor(i => i.totalPrice, (fake, user) => Math.Round(user.unitPrice * user.quantity, 2))
-            .GenerateLazy(500);
+            .GenerateLazy(100);
 
         foreach (var interaction in foodInteractions)
         {
@@ -373,20 +395,22 @@ CosmosClient クラスは、Azure Cosmos DB で SQL API を使用するための
     }
     ```
 
-    > 注意として、Bogus ライブラリは一連のテストデータを生成します。この例では、Bogus ライブラリと上記のルールを使用して 500 アイテムを作成しています。**GenerateLazy** メソッドは、**IEnumerable** タイプの変数を返すことにより、500 アイテムのリクエストに備えるように Bogus ライブラリーに指示します。LINQ はデフォルトで遅延実行を使用するため、コレクションが反復されるまで、アイテムは実際には作成されません。このコードブロックの最後にある **foreach** ループは、コレクションを反復処理し、Azure Cosmos DB にアイテムを作成します。
+    > 注意として、Bogus ライブラリは一連のテストデータを生成します。この例では、Bogus ライブラリと上記のルールを使用して 100 アイテムを作成しています。**GenerateLazy** メソッドは、**IEnumerable** タイプの変数を返すことにより、100 アイテムのリクエストに備えるように Bogus ライブラリに指示します。LINQ はデフォルトで遅延実行を使用するため、コレクションが反復されるまで、アイテムは実際には作成されません。
 
 1. **Main** メソッド内で **InitalizeContainer** メソッドを見つけます:
 
     ```csharp
-    using CosmosClient client = new CosmosClient(_endpointUri, _primaryKey);
-    Database database = await InitializeDatabase(client, "EntertainmentDatabase");
+    _client = new CosmosClient(_endpointUri, _primaryKey);
+
+    Database database = await InitializeDatabase(_client, "EntertainmentDatabase");
+
     Container container = await InitializeContainer(database, "EntertainmentContainer");
     ```
 
 1. 次のコードをメソッドに追加して、**LoadFoodAndBeverage** メソッドを呼び出します:
 
     ```csharp
-    await LoadFoodAndBeverage(container);
+    await LoadFoodAndBeverageAsync(container);
     ```
 
 1. **Main** メソッドは次のようになります:
@@ -394,9 +418,9 @@ CosmosClient クラスは、Azure Cosmos DB で SQL API を使用するための
     ```csharp
     public static async Task Main(string[] args)
     {
-        using CosmosClient client = new CosmosClient(_endpointUri, _primaryKey);
+        _client = new CosmosClient(_endpointUri, _primaryKey);
 
-        Database database = await InitializeDatabase(client, "EntertainmentDatabase");
+        Database database = await InitializeDatabase(_client, "EntertainmentDatabase");
 
         Container container = await InitializeContainer(database, "EntertainmentContainer");
 
@@ -430,11 +454,11 @@ CosmosClient クラスは、Azure Cosmos DB で SQL API を使用するための
 
     ```csharp
     var tvInteractions = new Bogus.Faker<WatchLiveTelevisionChannel>()
-            .RuleFor(i => i.id, (fake) => Guid.NewGuid().ToString())
-            .RuleFor(i => i.type, (fake) => nameof(WatchLiveTelevisionChannel))
-            .RuleFor(i => i.minutesViewed, (fake) => fake.Random.Number(1, 45))
-            .RuleFor(i => i.channelName, (fake) => fake.PickRandom(new List<string> { "NEWS-6", "DRAMA-15", "ACTION-12", "DOCUMENTARY-4", "SPORTS-8" }))
-            .GenerateLazy(500);
+        .RuleFor(i => i.id, (fake) => Guid.NewGuid().ToString())
+        .RuleFor(i => i.type, (fake) => nameof(WatchLiveTelevisionChannel))
+        .RuleFor(i => i.minutesViewed, (fake) => fake.Random.Number(1, 45))
+        .RuleFor(i => i.channelName, (fake) => fake.PickRandom(new List<string> { "NEWS-6", "DRAMA-15", "ACTION-12", "DOCUMENTARY-4", "SPORTS-8" }))
+        .GenerateLazy(100);
 
     foreach (var interaction in tvInteractions)
     {
@@ -448,9 +472,9 @@ CosmosClient クラスは、Azure Cosmos DB で SQL API を使用するための
     ```csharp
     public static async Task Main(string[] args)
     {
-        using CosmosClient client = new CosmosClient(_endpointUri, _primaryKey);
+        _client = new CosmosClient(_endpointUri, _primaryKey);
 
-        Database database = await InitializeDatabase(client, "EntertainmentDatabase");
+        Database database = await InitializeDatabase(_client, "EntertainmentDatabase");
 
         Container container = await InitializeContainer(database, "EntertainmentContainer");
 
@@ -470,14 +494,6 @@ CosmosClient クラスは、Azure Cosmos DB で SQL API を使用するための
 
 1. コンソールアプリケーションの出力を確認します。作成中の新しいアイテムに関連付けられているアイテム ID のリストが表示されます。
 
-1. **Main** メソッドを見つけ、メソッド内にある既存のコードを削除します:
-
-    ```csharp
-    public static async Task Main(string[] args)
-    {
-    }
-    ```
-
 1. **LoadTelevision** メソッドの下に、新しいメソッド**LoadMapViews** を作成し、以下の実装を行います:
 
     ```csharp
@@ -487,7 +503,7 @@ CosmosClient クラスは、Azure Cosmos DB で SQL API を使用するための
             .RuleFor(i => i.id, (fake) => Guid.NewGuid().ToString())
             .RuleFor(i => i.type, (fake) => nameof(ViewMap))
             .RuleFor(i => i.minutesViewed, (fake) => fake.Random.Number(1, 45))
-            .GenerateLazy(500);
+            .GenerateLazy(100);
 
         foreach (var interaction in mapInteractions)
         {
@@ -502,9 +518,9 @@ CosmosClient クラスは、Azure Cosmos DB で SQL API を使用するための
     ```csharp
     public static async Task Main(string[] args)
     {
-        using CosmosClient client = new CosmosClient(_endpointUri, _primaryKey);
+        _client = new CosmosClient(_endpointUri, _primaryKey);
 
-        Database database = await InitializeDatabase(client, "EntertainmentDatabase");
+        Database database = await InitializeDatabase(_client, "EntertainmentDatabase");
 
         Container container = await InitializeContainer(database, "EntertainmentContainer");
 
@@ -524,7 +540,7 @@ CosmosClient クラスは、Azure Cosmos DB で SQL API を使用するための
     dotnet run
     ```
 
-1. コンソールアプリケーションの出力を確認します。作成中の新しいアイテムに関連付けられているアイテム ID のリストが表示されます。これで3種類のドキュメント (PurchaseFoodOrBeverage, WatchLiveTelevisionChannel, ViewMap) を `CustomCollection` に配置し、Cosmos DB がいかにスキーマレスであるかを示しました。
+1. コンソールアプリケーションの出力を確認します。作成中の新しいアイテムに関連付けられているアイテム ID のリストが表示されます。これで、Cosmos DB がいかにスキーマレスであるかを示す 3 種類のドキュメント (PurchaseFoodOrBeverage, WatchLiveTelevisionChannel, ViewMap) が `EntertainmentContainer` に配置されました。
 
 1. Visual Studio Code でフォルダを閉じます。
 

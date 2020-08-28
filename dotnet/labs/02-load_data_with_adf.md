@@ -48,7 +48,6 @@ Azure Cosmos DB アカウント内にデータベースとコンテナーを作�
 
 **Azure Data Factory （ADF）** を使用して、**nutrition.json** ファイルに格納されている JSON 配列を Azure Blob Storage からインポートします。
 
-You do not need to do Steps 1-4 in this section and can proceed to Step 4 by opening your Data Factory (named importNutritionData with a random number suffix)if you are completing the lab through Microsoft Hands-on Labs or ran the setup script, you can use the pre-created Data Factory within your resource group.
 マイクロソフトハンズオンラボを通じてラボを完了するか、このラボのセットアップスクリプトを実行した場合は、このセクションの手順 1 〜 4 を実行する必要はなく、Data Factory（ランダムな番号のサフィックスが付いたimportNutritionDataという名前）を開いて手順 4 に進むことができ、リソースグループ内で事前に作成された Data Factory を使用することができます。
 
 1. ポータルの左側で、**リソースグループ** リンクを選択します。

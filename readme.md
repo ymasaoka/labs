@@ -9,6 +9,7 @@
 - [Sample Schedule](./decks/CosmosDBWorkshopSchedule2019.docx)
 
 **Deep-Dive Powerpoint Decks**
+
 - [Overview, Value Proposition & Use Cases](./decks/Overview-Value-Proposition-Use-Cases.pptx)
 - [Resource Model](./decks/Resource-Model.pptx)
 - [Request Units & Billing](./decks/Request-Units-Billing.pptx)
@@ -23,6 +24,7 @@
 - [Security](./decks/Security.pptx)
 
 **References**
+
 - [Use-Case cheat sheet (1-pager)](./decks/1Pager-Use-Cases.pptx)
 
 上記の workshop decks の他に、ハンズオンラボがあります。以下の .NET SDK と Java SDK を使用できるラボがあります:
@@ -36,15 +38,13 @@
 
 - Windows 10 64ビット オペレーティングシステム
   - [ダウンロード](https://www.microsoft.com/windows/get-windows-10)
-- Microsoft .NET Framework 4.5.1 以上 <sup>1</sup>
-  - [download](http://go.microsoft.com/fwlink/?LinkId=863262)
 
 **ソフトウェア**
 
 | ソフトウェア                                    | ダウンロードリンク                                                |
 | ------------------------------------------- | ------------------------------------------------------------ |
 | Git                                         | [/git-scm.com/downloads](https://git-scm.com/downloads)      |
-| .NET Core 2.1 (もしくは以上) SDK <sup>2</sup> | [/download.microsoft.com/dotnet-sdk-2.1](https://download.microsoft.com/download/E/2/6/E266C257-F7AF-4E79-8EA2-DF26031C84E2/dotnet-sdk-2.1.103-win-gs-x64.exe) |
+| .NET Core 3.1 (もしくは以上) SDK <sup>1</sup> | [/download.microsoft.com/dotnet-sdk-3.1](https://dotnet.microsoft.com/download/dotnet-core/thank-you/sdk-3.1.401-windows-x64-installer) |
 | Visual Studio Code                          | [/code.visualstudio.com/download](https://go.microsoft.com/fwlink/?Linkid=852157) |
 
 ------
@@ -70,8 +70,7 @@
 
 **注意事項**
 
-1. ローカルマシンにインストールした .NET Framework のバージョンがわからない場合は、次のリンクにアクセスして、インストールされているバージョンを確認する手順を確認できます: <https://docs.microsoft.com/dotnet/framework/migration-guide/how-to-determine-which-versions-are-installed>.
-2. ローカルマシンに .NET Core がすでにインストールされている場合は、 `dotnet --version` コマンドを使用して、.NET Core インストールのバージョンを確認する必要があります。
+1. ローカルマシンに .NET Core がすでにインストールされている場合は、 `dotnet --version` コマンドを使用して、.NET Core インストールのバージョンを確認する必要があります。
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
