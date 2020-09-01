@@ -13,16 +13,14 @@ namespace ChangeFeedConsole
         private static readonly string _primaryKey = "";
         private static readonly string _databaseId = "StoreDatabase";
         private static readonly string _containerId = "CartContainer";
-
         private static readonly string _destinationContainerId = "CartContainerByState";
-
-        private static CosmosClient cosmosClient = new CosmosClient(_endpointUrl, _primaryKey);
+        private static CosmosClient _client = new CosmosClient(_endpointUrl, _primaryKey);
 
         static async Task Main(string[] args)
         {
-                Database database = cosmosClient.GetDatabase(_databaseId);
-                Container container = db.GetContainer(_containerId);
-                Container destinationContainer = db.GetContainer(_destinationContainerId);
+                Database database = _client.GetDatabase(_databaseId);
+                Container container = database.GetContainer(_containerId);
+                Container destinationContainer = database.GetContainer(_destinationContainerId);
 
                 //todo: Add lab code here
 
