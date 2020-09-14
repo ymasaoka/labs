@@ -98,52 +98,52 @@ Azure Cosmos DB アカウント内にデータベースとコンテナーを作�
 
     ![The New linked service dialog is displayed](../media/03-adf_connecttoblob.jpg "Enter the SAS url in the dialog")
 
-9. **Create** を選択します。
-10. **Next** を選択します。
-11. **Browse** を選択し、ダブルクリックして **nutritiondata** フォルダを開きます。
-12. **NutritionData.json** ファイルを選択してから、**Choose** を選択します。
+1. **Create** を選択します。
+1. **Next** を選択します。
+1. **Browse** を選択し、ダブルクリックして **nutritiondata** フォルダを開きます。
+1. **NutritionData.json** ファイルを選択してから、**Choose** を選択します。
 
     ![The nutritiiondata folder is displayed](../media/03-adf_choosestudents.jpg "Select the NutritionData.json file")
 
-13. **Recursively** または **Binary Copy** にチェックが入っている場合は、チェックを外します。また、他のフィールドが空であることを確認してください。**Next** を選択します。
+1. **Copy file recursively** または **Binary Copy** がオンになっている場合、オフにします。また、他のフィールドが空であることを確認してください。**Next** を選択します。
 
     ![The input file or folder dialog is displayed](../media/03-adf_source_next.jpg "Ensure all other fields are empty, select next")
 
-14. **JSON format** としてファイル形式を選択します。**Next** を選択します。
+1. **JSON format** としてファイル形式を選択します。その後、**Next** を選択します。
 
     !["The file format settings dialog is displayed"](../media/03-adf_source_dataset_format.jpg "Ensure JSON format is selected, then select Next")
 
-15. これで、Blob ストレージコンテナーがソースとして nutrition.json ファイルに正常に接続されました。
+1. これで、Blob Storage コンテナーがソースとして nutrition.json ファイルに正常に接続されました。
 
-16. **Destination data store** に Cosmos DB ターゲットデータストアを追加するには、**Create new connection** を選択し、**Azure Cosmos DB (SQL API)** を選択します。
+1. **Destination data store** に Cosmos DB ターゲットデータストアを追加するには、**Create new connection** を選択し、**Azure Cosmos DB (SQL API)** を選択します。
 
     !["The New Linked Service dialog is displayed"](../media/03-adf_selecttarget.jpg "Select the Azure Cosmos DB service type")
 
-17. リンクされたサービスに **targetcosmosdb** という名前を付け、Azure サブスクリプションと Cosmos DB アカウントを選択します。以前に作成したCosmos DB の **ImportDatabase** も選択する必要があります。
+1. リンクされたサービスに **targetcosmosdb** という名前を付け、Azure サブスクリプションと Cosmos DB アカウントを選択します。以前に作成した Cosmos DB **ImportDatabase** も選択する必要があります。
 
     !["The linked service configuration dialog is displayed"](../media/03-adf_selecttargetdb.jpg "Select the ImportDatabase database")
 
-18. 新しく作成した **targetcosmosdb** 接続を宛先データストアとして選択します。
+1. 新しく作成した **targetcosmosdb** 接続を宛先データストアとして選択します。
 
     !["The destination data source dialog is displayed"](../media/03-adf_destconnectionnext.jpg "Select your recently created data source")
 
-19. ドロップダウンメニューから **FoodCollection** コンテナを選択します。Blob ストレージファイルを正しい Cosmos DB コンテナにマップします。**Next** を選択して続行します。
+1. ドロップダウンメニューから **FoodCollection** コンテナを選択します。Blob ストレージファイルを正しい Cosmos DB コンテナにマップします。**Next** を選択して続行します。
 
     !["The table mapping dialog is displayed"](../media/03-adf_correcttable.jpg "Select the FoodCollection container")
 
-20. `Settings` を変更する必要はありません。**next** を選択します。
+1. `Settings` を変更する必要はありません。**next** を選択します。
 
     !["The settings dialog is displayed"](../media/03-adf_settings.jpg "Review the dialog, select next")
 
-21. **Next** を選択してデプロイを開始し、デプロイが完了したら **Monitor** を選択します。
+1. **Next** を選択して展開を開始し、展開が完了したら、**Monitor** を選択します。
 
     !["The pipeline runs are displayed"](../media/03-adf_progress.jpg "Notice the pipeline is In progress")
 
-22. 数分後、ページを更新すると、ImportNutrition パイプラインのステータスが **Succeeded** と表示されます。
+1. 数分後、ページを更新すると、ImportNutrition パイプラインのステータスが **Succeeded** と表示されます。
 
     !["The pipeline runs are displayed"](../media/03-adf_progress_complete.jpg "The pipeline has succeeded")
 
-23. インポートプロセスが完了したら、ADF を閉じます。次に、インポートしたデータの検証に進みます。
+1. インポートプロセスが完了したら、ADF を閉じます。次に、インポートしたデータの検証に進みます。
 
 ## インポートしたデータの検証
 
